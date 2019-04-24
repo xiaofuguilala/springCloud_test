@@ -1,0 +1,17 @@
+use test_spring;
+
+CREATE TABLE person_list(
+	id int NOT NULL AUTO_INCREMENT,
+	personname VARCHAR(255) NULL,
+	personaccount VARCHAR(255) NULL,
+	personpasswd VARCHAR(255) NULL,
+	personemail VARCHAR(255) NULL,
+	personphone VARCHAR(255) NULL,
+	personcard VARCHAR(255) NULL,
+	personbirth VARCHAR(255) NULL,
+	personsex VARCHAR(255) NULL,
+	PRIMARY KEY(id)
+);
+
+insert person_list(personname,personaccount,personpasswd,personemail,personphone,personcard,personbirth,personsex)
+values ('Michael','12345678','1234','12345678@qq.com','13288885555','123456789987654321','2010-06-12','ÄÐ');

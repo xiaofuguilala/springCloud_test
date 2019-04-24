@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.domain.dao.UserEntityMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.example.demo.domain.entity.UserEntity">
+        <id column="id" property="id"/>
+        <result column="personname" property="personname"/>
+        <result column="personaccount" property="personaccount"/>
+        <result column="personpasswd " property="personpasswd"/>
+        <result column="personemail" property="personemail"/>
+        <result column="personphone" property="personphone"/>
+        <result column="personcard" property="personcard"/>
+        <result column="personbirth" property="personbirth"/>
+        <result column="personsex" property="personsex"/>
+    </resultMap>
+
+</mapper>

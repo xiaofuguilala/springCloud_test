@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.domain.dao.PatientEntityMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.example.demo.domain.entity.PatientEntity">
+        <id column="id" property="id"/>
+        <result column="patientName" property="patientName"/>
+        <result column="patientBed" property="patientBed"/>
+        <result column="hospitId " property="hospitId"/>
+        <result column="patientSex" property="patientSex"/>
+        <result column="patientAge" property="patientAge"/>
+        <result column="patientBirth" property="patientBirth"/>
+        <result column="patientChemotherapy" property="patientChemotherapy"/>
+        <result column="patientCancer" property="patientCancer"/>
+        <result column="patientRecordTime" property="patientRecordTime"/>
+    </resultMap>
+
+</mapper>

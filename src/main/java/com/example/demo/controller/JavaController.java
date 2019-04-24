@@ -2,28 +2,53 @@ package com.example.demo.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.example.demo.util.TransCoding;
+import com.example.demo.domain.bean.ResultTotal;
+import com.example.demo.domain.entity.UserEntity;
+import com.example.demo.domain.vo.ReceiveBackVo;
+import com.example.demo.domain.vo.UserInfoVo;
+import com.example.demo.domain.vo.UserListVo;
+import com.example.demo.service.AlModelEnityService;
+import com.example.demo.service.AllChosenEntityService;
+import com.example.demo.service.FaceRecogDetectAlEntityService;
+import com.example.demo.service.IUserEntityService;
+
+
 import com.example.demo.system.SystemConstant;
+import com.example.demo.util.TransCoding;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.util.*;
 
-
 @RestController
+@RequestMapping("/api")
 public class JavaController {
+
     @Autowired
     private RestTemplate restTemplate;
+
+    @Resource
+    IUserEntityService userEntityService;
+
+    @Resource
+    FaceRecogDetectAlEntityService faceRecogDetectAlEntityService;
+
+    @Resource
+    AlModelEnityService alModelEnityService;
+
+    @Resource
+    AllChosenEntityService allChosenEntityService;
+
 
     //简写java本地服务调用
     @RequestMapping("/java-user")
@@ -31,12 +56,111 @@ public class JavaController {
         return "{'username': 'java', 'password': 'java'}";
     }
 
-    //无参调用
-    @RequestMapping("/python-user")
-    public String PythonUser() {
-        //return restTemplate.getForEntity("http://py-sidecar/getUser", String.class).getBody();
-        ResponseEntity<String> responseEntity = restTemplate.getForEntity("http://py-sidecar/getUser", String.class);
-        return responseEntity.getBody();
+    //数据库调用
+    @ResponseBody
+    @RequestMapping("/get-list")
+    public List<UserEntity> GetList() {
+        return userEntityService.getAll();
+    }
+
+    //数据库单条调用
+    @ResponseBody
+    @RequestMapping("/get-image")
+    public String GetImage() {
+        return userEntityService.getIMAGE();
+    }
+
+    //用户登录前端交互
+    @ResponseBody
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public ResultTotal userLogin(@RequestBody UserInfoVo vo, HttpServletRequest request) {
+        boolean result = userEntityService.login(vo);
+
+        if (result) {
+            return ResultTotal.success();
+        }
+
+        return ResultTotal.fail();
+    }
+
+    //用户注册前端交互
+    @ResponseBody
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    public ResultTotal userRegister(@RequestBody UserListVo vo, HttpServletRequest request){
+        boolean result = userEntityService.register(vo);
+
+        if (result){
+            return ResultTotal.success();
+        }
+        return ResultTotal.fail();
+    }
+
+    //人脸识别系统检测算法表中算法名称
+    @ResponseBody
+    @RequestMapping(value = "/facerecogdetectalname", method = RequestMethod.GET)
+    public List<String> faceSystemdetectalname(){
+        return faceRecogDetectAlEntityService.facerecogdetectalname();
+    }
+
+    //模型库表中模型名称
+    @ResponseBody
+    @RequestMapping(value = "/facerecogdetectmodelname", method = RequestMethod.GET)
+    public List<String> modelName(){
+        return alModelEnityService.modelname();
+    }
+
+    @RequestMapping(path = "/information", method = RequestMethod.GET)
+    @ResponseBody
+    public UserEntity information() {
+        return new UserEntity();
+    }
+
+    //接收前端选择的人脸检测算法名称和模型名称
+    @ResponseBody
+    @RequestMapping(value = "/chosenback1", method = RequestMethod.POST)
+    public ResultTotal chosenBack1(@RequestBody ReceiveBackVo vo, HttpServletRequest request){
+        boolean result = allChosenEntityService.frontbackpara1(vo);
+
+        if (result){
+            return ResultTotal.success();
+        }
+        return ResultTotal.fail();
+    }
+
+    //接收前端选择的人脸对齐算法名称和模型名称
+    @ResponseBody
+    @RequestMapping(value = "/chosenback2", method = RequestMethod.POST)
+    public ResultTotal chosenBack2(@RequestBody ReceiveBackVo vo, HttpServletRequest request){
+        boolean result = allChosenEntityService.frontbackpara2(vo);
+
+        if (result){
+            return ResultTotal.success();
+        }
+        return ResultTotal.fail();
+    }
+
+    //接收前端选择的人脸识别算法名称和模型名称
+    @ResponseBody
+    @RequestMapping(value = "/chosenback3", method = RequestMethod.POST)
+    public ResultTotal chosenBack3(@RequestBody ReceiveBackVo vo, HttpServletRequest request){
+        boolean result = allChosenEntityService.frontbackpara3(vo);
+
+        if (result){
+            return ResultTotal.success();
+        }
+        return ResultTotal.fail();
+    }
+
+    //接收前端选择的人脸训练算法名称和模型名称
+    @ResponseBody
+    @RequestMapping(value = "/chosenback4", method = RequestMethod.POST)
+    public ResultTotal chosenBack4(@RequestBody ReceiveBackVo vo, HttpServletRequest request){
+        boolean result = allChosenEntityService.frontbackpara4(vo);
+
+        if (result){
+            return ResultTotal.success();
+        }
+        return ResultTotal.fail();
     }
 
     //有参调用-人脸检测
@@ -81,12 +205,12 @@ public class JavaController {
                     String result1 = restTemplate.postForEntity("http://py-sidecar/tinyfaceDetect", DecParamMap, String.class).getBody();
 
                     Map decMap = JSON.parseObject(result1);
-                    //JSONArray job = detect_json.getJSONArray("result");
+                    //JSONArray job = detect_json.getJSONArray("bean");
                     //System.out.print("-------------------------\n");
                     //System.out.print(job);
 
-                    //String[] decresult= (String[]) decMap.get("result");
-                    String decresult = decMap.get("result").toString();
+                    //String[] decresult= (String[]) decMap.get("bean");
+                    String decresult = decMap.get("bean").toString();
                     String[] job = decresult.split(",");
                     for (int k = 0; k < job.length; k++) {
 
@@ -100,7 +224,7 @@ public class JavaController {
                         switch (status) {
                             case "S0101":
                                 MultiValueMap<String, String> RecognitionParam = new LinkedMultiValueMap<String, String>();//识别参数
-                                RecognitionParam.add("targetImage", json.get("result").toString());
+                                RecognitionParam.add("targetImage", json.get("bean").toString());
                                 //RecognitionParam.put("targetImage",	Cropcode);
                                 RecognitionParam.add("threshold", "2");
                                 RecognitionParam.add("uid", uid);
@@ -116,7 +240,7 @@ public class JavaController {
 //                                cr.setImage(decresult);
 //                                cr.setStatus(Rerstatus);
 //                                cr.setPensonID(pensonID);
-//                                cr.settargetImage(json.get("result").toString());
+//                                cr.settargetImage(json.get("bean").toString());
 //
 //                                //  cr.=detect_json["people"];
 //                                checkrecordService.insert(cr);
@@ -147,7 +271,7 @@ public class JavaController {
 //                    checkrecordService.insert(cr);
                     if (CropListSuccess.size() == 0) {
                         result = new ResponseEntity("照片预处理失败!", HttpStatus.BAD_REQUEST);
-                    }else{
+                    } else {
                         result = new ResponseEntity(null, HttpStatus.OK);
                     }
                 }

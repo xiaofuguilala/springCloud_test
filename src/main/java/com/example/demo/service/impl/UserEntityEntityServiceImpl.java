@@ -1,40 +1,79 @@
 package com.example.demo.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.example.demo.domain.dao.UserDao;
+
+import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import com.example.demo.domain.dao.UserEntityMapper;
 import com.example.demo.domain.entity.UserEntity;
-import com.example.demo.mapper.UserMapper;
-import com.example.demo.model.User;
-import com.example.demo.service.IUserService;
+import com.example.demo.domain.vo.UserInfoVo;
+import com.example.demo.domain.vo.UserListVo;
+import com.example.demo.service.IUserEntityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service("userService")
-public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
+@Service("userEntityService")
+public class UserEntityEntityServiceImpl extends ServiceImpl<UserEntityMapper, UserEntity> implements IUserEntityService {
 
     @Autowired
-    private UserDao userDao;
+    private UserEntityMapper userEntityMapper;
+
 
     @Override
-    public List<User> getAll() {
+    public List<UserEntity> getAll() {
         return baseMapper.selectList(null);
     }
 
-    //返回名字为Michael的人的照片地址
+    //返回名字为Michael的人的email地址
     @Override
-    public String getIMAGE(){
+    public String getIMAGE() {
         String personname = "Michael";
-        User user = baseMapper.selectOne(new QueryWrapper<User>().lambda().eq(User::getPersonname, personname));
-        return user.getPersonimageadds();
+        UserEntity userEntity = new UserEntity();
+        userEntity.setPersonaccount(personname);
+        UserEntity user = baseMapper.selectOne(userEntity);
+        return user.getPersonemail();
     }
 
     //返回账号密码
     @Override
-    public UserEntity getLogin(String username, String passwd){
-        UserEntity userEntity = userDao.queryUserByNameAndPasswd(username, passwd);
-        return userEntity;
+    public boolean login(UserInfoVo vo) {
+        UserEntity user = new UserEntity();
+        user.setPersonaccount(vo.getAccount());
+        UserEntity userEntity = userEntityMapper.selectOne(user);
+
+        if (userEntity == null)
+        {
+            return false;
+        }
+        return userEntity.getPersonpasswd().equals(vo.getPasswd());
     }
+
+    //注册
+    @Override
+    public boolean register(UserListVo vo){
+
+        boolean exist = false;
+        UserEntity userEntity = new UserEntity();
+        userEntity.setPersonaccount(vo.getAccount());
+        UserEntity userEntityTemp = userEntityMapper.selectOne(userEntity);
+
+        if (userEntityTemp == null){
+            exist = true;
+        }
+        else return exist;
+
+        userEntity.setPersonname(vo.getUsername())
+                .setPersonaccount(vo.getAccount())
+                .setPersonpasswd(vo.getPasswd())
+                .setPersonemail(vo.getEmail())
+                .setPersonphone(vo.getPhone())
+                .setPersoncard(vo.getCard())
+                .setPersonbirth(vo.getBirth())
+                .setPersonsex(vo.getSex());
+
+        baseMapper.insert(userEntity);
+
+        return exist;
+    }
+
 }
